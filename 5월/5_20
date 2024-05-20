@@ -1,51 +1,43 @@
-# 의존관계 자동 주입
+## Controller: 웹 요청을 처리하고 비즈니스 로직을 처리한 후 응답을 반환하는 역할.
 
 <aside>
-💡 의존관계 주입이란 ?
-
+💡 @Controller VS @RestController
 </aside>
 
-- 어떠한 객체가 역할을 하기 위해 꼭 알아야 하는 객체를 직접 생성하지 않고 외부에 의해 주입받는 것
+- `@Controller` : return 값과 일치하는 뷰 템플릿을 찾아서 반환.
+- `@RestController` : return 값과 일치하는 데이터 자체를 반환 (`@Controller + @ResponseBody`).
+
+- `@ResponseBody` : 컨트롤러 메서드가 반환하는 값을 직접 클라이언트에게 전달. 즉, return 값 자체를 그대로 반환한다.
 
 <aside>
-💡 의존관계 주입 방법
-
+💡 @RequestParam
 </aside>
 
-- 생성자 주입
-    - 생성자를 통해 의존 관계 주입
-    - 생성자 호출 시점에 딱 1번 호출되는것이 보장
-    - 불변, 필수 의존관계시 사용
-    - 생성자가 단 1개일땐 @Autowired 생략 가능
-- setter 주입
-    - 선택, 변경 가능성이 있는 의존관계에서 사용
-- 필드 주입
-    - 필드에 바로 주입
-    - 쓰지 말자
-- 메서드 주입
-    - 한번에 여러 필드 주입 가능
-    - 이 또한 별로 안씀
-
-→ 어플리케이션은 웬만하면 불변이어야 하기 때문에 , 생성자 주입을 쓰는 방식이 가장 좋은 방법이다 . 또 실제로 거의 대부분을 생성자 주입방식을 선택하고 특별한 경우에만 setter 주입을 사용한다
+- HTTP 요청으로 들어온 쿼리파라미터 예) `?name=minhyung` 에서 키값을 통해 value 값을 가져온다.
+- `?name=minhyung` 에서 key 값은 `name`, value 값은 `minhyung`.
+- `(@RequestParam String name)` → `minhyung` 값을 가져온다.
+    - `(@RequestParam(name = “abc”) String name)` → `name`이란 변수에 `?abc=~~` 의 value 를 가져올 수 있다.
+    - `required`를 사용하여 필수값인지 결정할 수 있다.
+- `HttpServletRequest` 객체를 사용해서 가져오는 방법도 있다!
 
 <aside>
-💡 LOMBOK 과 함께 사용
-
+💡 Model 객체
 </aside>
+
+- Controller에서 View로 데이터를 전달하기 위해선 중간 객체가 필요하다.
+    - Model 객체.
 
 ```java
-@Service
-@RequiredArgsConstructor
-public class AnswerService {
+@GetMapping("/welcome")
+public String welcome(Model model) { //뷰에다 전달할 것이기 때문에 Model
+    model.addAttribute("welcomeMsg", "Welcome to my page!"); // 맡길 때 이름이랑 찾을 때 이름이 일치하면 된다! 
 
-    private final AnswerRepository answerRepository;
-    private final QuestionRepository questionRepository;
+    List<Item> items = Arrays.asList(
+        new Item("pen", 3000),
+        new Item("notebook", 50000),
+        new Item("cup", 2500)
+    );
 
-//....
-
-```
-
-- @Service 어노테이션으로 스프링 컨테이너에 빈으로 등록
-- 롬복의 어노테이션인  @RequiredArgsConstructor 로 모든 필드에 대한 생성자를 자동으로 생성
-- 생성자가 하나이기 때문에 , private final ~~ 을 필드에 적어주기만 하면 자동으로 의존성을 주입해준다 !
-- @ReqiredArgsConstructor + final 이 붙은 필드 : 의존성 주입 완료
+    model.addAttribute("itemList", items); // (템플릿에서 사용할 이름, 객체)
+    return "welcome"; // 뷰 템플릿을 반환
+}
