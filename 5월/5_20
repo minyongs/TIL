@@ -1,0 +1,51 @@
+# 의존관계 자동 주입
+
+<aside>
+💡 의존관계 주입이란 ?
+
+</aside>
+
+- 어떠한 객체가 역할을 하기 위해 꼭 알아야 하는 객체를 직접 생성하지 않고 외부에 의해 주입받는 것
+
+<aside>
+💡 의존관계 주입 방법
+
+</aside>
+
+- 생성자 주입
+    - 생성자를 통해 의존 관계 주입
+    - 생성자 호출 시점에 딱 1번 호출되는것이 보장
+    - 불변, 필수 의존관계시 사용
+    - 생성자가 단 1개일땐 @Autowired 생략 가능
+- setter 주입
+    - 선택, 변경 가능성이 있는 의존관계에서 사용
+- 필드 주입
+    - 필드에 바로 주입
+    - 쓰지 말자
+- 메서드 주입
+    - 한번에 여러 필드 주입 가능
+    - 이 또한 별로 안씀
+
+→ 어플리케이션은 웬만하면 불변이어야 하기 때문에 , 생성자 주입을 쓰는 방식이 가장 좋은 방법이다 . 또 실제로 거의 대부분을 생성자 주입방식을 선택하고 특별한 경우에만 setter 주입을 사용한다
+
+<aside>
+💡 LOMBOK 과 함께 사용
+
+</aside>
+
+```java
+@Service
+@RequiredArgsConstructor
+public class AnswerService {
+
+    private final AnswerRepository answerRepository;
+    private final QuestionRepository questionRepository;
+
+//....
+
+```
+
+- @Service 어노테이션으로 스프링 컨테이너에 빈으로 등록
+- 롬복의 어노테이션인  @RequiredArgsConstructor 로 모든 필드에 대한 생성자를 자동으로 생성
+- 생성자가 하나이기 때문에 , private final ~~ 을 필드에 적어주기만 하면 자동으로 의존성을 주입해준다 !
+- @ReqiredArgsConstructor + final 이 붙은 필드 : 의존성 주입 완료
